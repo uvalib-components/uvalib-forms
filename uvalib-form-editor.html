@@ -16,7 +16,7 @@
         display: block;
       }
     </style>
-    <uvalib-form-editor-section items="{{_items}}" on-change="_calcDef"></uvalib-form-editor-section>
+    <uvalib-form-editor-section conf="{{_conf}}" on-change="_calcDef"></uvalib-form-editor-section>
   </template>
 
   <script>
@@ -29,25 +29,46 @@
           type: String,
           notify: true
         },
+        /*
         _items: {
           type: Array,
           value: function(){return [];}
         },
+        _title: {
+          type: String,
+          value: "",
+          notify: true
+        },
+        */
+        _conf: {
+          type: Object,
+          value: {}
+        },
+        /*
         _formConfig: {
           type: Object,
-          computed: "_makeConfig(_items,_items.splices)"
+          value: function(){return {};}
+//          computed: "_makeConfig(_title,_items,_items.splices)"
         },
+        */
       },
-
+/*
+      observers: ['_makeConfig(_title,_items,_items.splices)'],
+*/
       _calcDef: function(){
         this.debounce('defbuild',function(){
-          this.formConfig = JSON.stringify(this._formConfig);
+          this.formConfig = JSON.stringify(this._conf);
         },200);
       },
+/*
       _makeConfig: function(){
-        return {type:'selection',items:this._items};
+        this.set('_formConfig',{
+          type:'selection',
+          items:this._items,
+          title:this._title
+        });
       }
-
+*/
     });
   </script>
 </dom-module>

@@ -13,21 +13,27 @@
     <style>
       :host {
         display: block;
+      }
+      .section {
+        display: block;
         border-radius: 25px;
         border: 2px solid #73AD21;
         padding: 10px;
         margin: 10px;
       }
     </style>
-    <template is="dom-repeat" items="[[items]]">
-      <template is="dom-if" if="[[_isHeading(item)]]">
-        <h2>[[item.text]]</h2>
+    <h1>[[config.title]]</h1>
+    <div class="section">
+      <template is="dom-repeat" items="[[config.items]]">
+        <template is="dom-if" if="[[_isHeading(item)]]">
+          <h2>[[item.text]]</h2>
+        </template>
+        <template is="dom-if" if="[[_isSection(item)]]">
+          <!-- Recursion! Nice :) -->
+          <uvalib-form-section config="[[item]]"></uvalib-form-section>
+        </template>
       </template>
-      <template is="dom-if" if="[[_isSection(item)]]">
-        <!-- Recursion! Nice :) -->
-        <uvalib-form-section items="[[item.items]]"></uvalib-form-section>
-      </template>
-    </template>
+    </div>
   </template>
 
   <script>
@@ -36,10 +42,16 @@
       is: 'uvalib-form-section',
 
       properties: {
-        items: {
+        config: {
+          type: Object,
+          value: {}
+        },
+        /*
+        _items: {
           type: Array,
           value: []
         }
+        */
       },
       _isHeading: function(item){
         return (item.type === 'heading');

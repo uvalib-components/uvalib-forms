@@ -2,6 +2,7 @@
 <!--<link rel="import" href="../polymerfire/firebase-document.html">-->
 <link rel="import" href="../paper-material/paper-material.html">
 <link rel="import" href="../paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
@@ -23,6 +24,7 @@
       }
     </style>
 
+    <paper-input label="Section Title" value="{{_title}}"></paper-input>
     <template is="dom-repeat" items="[[items]]">
       <paper-material>
         <paper-toolbar>
@@ -33,7 +35,12 @@
           <uvalib-form-editor-addnew on-add="_newItem" index="[[index]]"></uvalib-form-editor-addnew>
         </paper-toolbar>
         <div class="config-area">
-          <uvalib-form-editor-item item="{{item}}" on-change="_fireChange"></uvalib-form-editor-item>
+          <template is="dom-if" if="[[_isHeading(item)]]">
+            <uvalib-form-editor-item item="{{item}}" on-change="_fireChange"></uvalib-form-editor-item>
+          </template>
+          <template is="dom-if" if="[[_isSection(item)]]">
+            <uvalib-form-editor-section config="{{item}}" on-change="_fireChange"></uvalib-form-editor-item>
+          </template>
         </div>
       </paper-material>
     </template>
@@ -46,13 +53,24 @@
       is: 'uvalib-form-editor-section',
 
       properties: {
+        _title: {
+          type: String,
+          value: "",
+          notify: true
+        },
         items: {
           type: Array,
           value: function() {return [];},
           notify: true
+        },
+        conf: {
+          type: Object,
+          value: {},
+          notify: true
         }
       },
-      observers: ['_fireChange(items.splices)'],
+
+      observers: ['_fireChange(_title,items.splices)'],
       _first: function(index){
         return (index==0);
       },
@@ -85,7 +103,14 @@
         this.splice('items',index,0,e.detail);
       },
       _fireChange: function(){
+        this.set('conf',{type:"section",title:this._title, items:this.items});
         this.fire('change');
+      },
+      _isHeading: function(item){
+        return (item.type === 'heading');
+      },
+      _isSection: function(item){
+        return (item.type === 'section');
       }
 
     });
