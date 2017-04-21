@@ -1,0 +1,93 @@
+<link rel="import" href="../polymer/polymer.html">
+<!--<link rel="import" href="../polymerfire/firebase-document.html">-->
+<link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="uvalib-form-editor-item.html">
+<link rel="import" href="uvalib-form-editor-addnew.html">
+
+<dom-module id="uvalib-form-editor-section">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      paper-material {
+        margin: 10px;
+        @apply(--layout-verticle);
+      }
+      .config-area {
+        margin: 10px;
+      }
+    </style>
+
+    <template is="dom-repeat" items="[[items]]">
+      <paper-material>
+        <paper-toolbar>
+          <span class="title">[[item.type]]</span>
+          <paper-icon-button icon="arrow-upward" on-tap="_moveUp" index="[[index]]" hidden$="[[_first(index)]]"></paper-icon-button>
+          <paper-icon-button icon="arrow-downward" on-tap="_moveDown" index="[[index]]" hidden$="[[_last(index)]]"></paper-icon-button>
+          <paper-icon-button icon="delete" on-tap="_delete" index="[[index]]"></paper-icon-button>
+          <uvalib-form-editor-addnew on-add="_newItem" index="[[index]]"></uvalib-form-editor-addnew>
+        </paper-toolbar>
+        <div class="config-area">
+          <uvalib-form-editor-item item="{{item}}" on-change="_fireChange"></uvalib-form-editor-item>
+        </div>
+      </paper-material>
+    </template>
+    <uvalib-form-editor-addnew on-add="_newItem" index="[[items.length]]"></uvalib-form-editor-addnew>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'uvalib-form-editor-section',
+
+      properties: {
+        items: {
+          type: Array,
+          value: function() {return [];},
+          notify: true
+        }
+      },
+      observers: ['_fireChange(items.splices)'],
+      _first: function(index){
+        return (index==0);
+      },
+      _last: function(index){
+        return (index==this.items.length-1);
+      },
+
+      _noSections: function(){
+        return (this.items.length == 0);
+      },
+
+      _delete: function(e){
+        var index = (e.currentTarget.index)? e.currentTarget.index: 0;
+        console.log("removing item at "+parseInt(index));
+        return this.splice('items',index,1)[0];
+      },
+      _moveUp: function(e){
+        var index = (e.currentTarget.index)? e.currentTarget.index: 0;
+        console.log("moving item at "+parseInt(index)+" up");
+        this.splice('items',index-1,0,this._delete(e));
+      },
+      _moveDown: function(e){
+        var index = (e.currentTarget.index)? e.currentTarget.index: 0;
+        console.log("moving item at "+parseInt(index)+" down");
+        this.splice('items',index+1,0,this._delete(e));
+      },
+      _newItem: function(e){
+        var index = (e.currentTarget.index)? e.currentTarget.index: 0;
+        console.log("creating a new item at "+parseInt(index));
+        this.splice('items',index,0,e.detail);
+      },
+      _fireChange: function(){
+        this.fire('change');
+      }
+
+    });
+  </script>
+</dom-module>

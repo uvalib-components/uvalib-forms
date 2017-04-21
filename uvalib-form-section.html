@@ -8,16 +8,24 @@
 @demo demo/index.html
 -->
 
-<dom-module id="uvalib-form">
+<dom-module id="uvalib-form-section">
   <template>
     <style>
       :host {
         display: block;
+        border-radius: 25px;
+        border: 2px solid #73AD21;
+        padding: 10px;
+        margin: 10px;
       }
     </style>
-    <template is="dom-repeat" items="[[_config]]">
+    <template is="dom-repeat" items="[[items]]">
       <template is="dom-if" if="[[_isHeading(item)]]">
         <h2>[[item.text]]</h2>
+      </template>
+      <template is="dom-if" if="[[_isSection(item)]]">
+        <!-- Recursion! Nice :) -->
+        <uvalib-form-section items="[[item.items]]"></uvalib-form-section>
       </template>
     </template>
   </template>
@@ -25,23 +33,19 @@
   <script>
     Polymer({
 
-      is: 'uvalib-form',
+      is: 'uvalib-form-section',
 
       properties: {
-        def: {
-          type: String,
-          value: "{}",
-        },
-        _config: {
-          type: Object,
-          computed: '_createConfig(def)'
+        items: {
+          type: Array,
+          value: []
         }
       },
       _isHeading: function(item){
         return (item.type === 'heading');
       },
-      _createConfig: function(defString){
-        return JSON.parse(defString);
+      _isSection: function(item){
+        return (item.type === 'section');
       }
     });
   </script>
