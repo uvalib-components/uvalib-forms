@@ -25,12 +25,16 @@
     </style>
 
     <paper-input label="Section Title" value="{{_title}}"></paper-input>
-    <template is="dom-repeat" items="[[items]]">
+    <template is="dom-repeat" items="{{conf.items}}">
       <paper-material>
         <paper-toolbar>
           <span class="title">[[item.type]]</span>
-          <paper-icon-button icon="arrow-upward" on-tap="_moveUp" index="[[index]]" hidden$="[[_first(index)]]"></paper-icon-button>
-          <paper-icon-button icon="arrow-downward" on-tap="_moveDown" index="[[index]]" hidden$="[[_last(index)]]"></paper-icon-button>
+          <template is="dom-if" if="[[!_first(index,conf.items)]]">
+            <paper-icon-button icon="arrow-upward" on-tap="_moveUp" index="[[index]]"></paper-icon-button>
+          </template>
+          <template is="dom-if" if="[[!_last(index,conf.items)]]">
+            <paper-icon-button icon="arrow-downward" on-tap="_moveDown" index="[[index]]"></paper-icon-button>
+          </template>
           <paper-icon-button icon="delete" on-tap="_delete" index="[[index]]"></paper-icon-button>
           <uvalib-form-editor-addnew on-add="_newItem" index="[[index]]"></uvalib-form-editor-addnew>
         </paper-toolbar>
@@ -39,12 +43,13 @@
             <uvalib-form-editor-item item="{{item}}" on-change="_fireChange"></uvalib-form-editor-item>
           </template>
           <template is="dom-if" if="[[_isSection(item)]]">
+            <h2>[[item.title]]</h2>
             <uvalib-form-editor-section config="{{item}}" on-change="_fireChange"></uvalib-form-editor-item>
           </template>
         </div>
       </paper-material>
     </template>
-    <uvalib-form-editor-addnew on-add="_newItem" index="[[items.length]]"></uvalib-form-editor-addnew>
+    <uvalib-form-editor-addnew on-add="_newItem" index="[[conf.items.length]]"></uvalib-form-editor-addnew>
   </template>
 
   <script>
@@ -56,54 +61,70 @@
         _title: {
           type: String,
           value: "",
+          observer: '_titleChanged',
           notify: true
         },
-        items: {
+/*
+        _items: {
           type: Array,
           value: function() {return [];},
+          observer: '_itemsChanged',
           notify: true
         },
+*/
         conf: {
           type: Object,
-          value: {},
+          value: {type:"section",title:"",items:[]},
           notify: true
         }
       },
 
-      observers: ['_fireChange(_title,items.splices)'],
-      _first: function(index){
+      observers: ['_fireChange(_title,conf.items.splices)'],
+      _titleChanged: function(){
+        this.set('conf.title',this._title);
+      },
+      _itemsChanged: function(){
+        this.set('conf.items',this.conf.items);
+      },
+      _first: function(index,items){
         return (index==0);
       },
-      _last: function(index){
-        return (index==this.items.length-1);
+      _last: function(index,items){
+        return (index==this.conf.items.length-1);
       },
 
       _noSections: function(){
-        return (this.items.length == 0);
+        return (this.conf.items.length == 0);
       },
 
       _delete: function(e){
         var index = (e.currentTarget.index)? e.currentTarget.index: 0;
         console.log("removing item at "+parseInt(index));
-        return this.splice('items',index,1)[0];
+        var removed = this.splice('conf.items',index,1)[0];
+        this.notifyPath('conf.items');
+        return removed;
       },
       _moveUp: function(e){
         var index = (e.currentTarget.index)? e.currentTarget.index: 0;
         console.log("moving item at "+parseInt(index)+" up");
-        this.splice('items',index-1,0,this._delete(e));
+        this.splice('conf.items',index-1,0,this._delete(e));
+        this.notifyPath('conf.items');
       },
       _moveDown: function(e){
         var index = (e.currentTarget.index)? e.currentTarget.index: 0;
         console.log("moving item at "+parseInt(index)+" down");
-        this.splice('items',index+1,0,this._delete(e));
+        this.splice('conf.items',index+1,0,this._delete(e));
+        this.notifyPath('conf.items');
       },
       _newItem: function(e){
         var index = (e.currentTarget.index)? e.currentTarget.index: 0;
         console.log("creating a new item at "+parseInt(index));
-        this.splice('items',index,0,e.detail);
+        this.splice('conf.items',index,0,e.detail);
+        this.notifyPath('conf');
       },
       _fireChange: function(){
-        this.set('conf',{type:"section",title:this._title, items:this.items});
+        console.log('change fired!');
+//        this.set('conf',{type:"section",title:this._title, items:this.conf.items});
         this.fire('change');
       },
       _isHeading: function(item){

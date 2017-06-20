@@ -36,7 +36,10 @@
         }
       },
       _createConfig: function(defString){
-        return JSON.parse(defString);
+        if (defString)
+          return JSON.parse(defString);
+        else
+          return {};
       }
     });
   </script>

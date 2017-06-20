@@ -27,6 +27,7 @@
       properties: {
         formConfig: {
           type: String,
+          value: "",
           notify: true
         },
         /*
@@ -42,7 +43,9 @@
         */
         _conf: {
           type: Object,
-          value: {}
+          value: {type:"section",title:"",items:[]},
+//          observer: "_calcDef",
+          notify: true
         },
         /*
         _formConfig: {
@@ -55,8 +58,10 @@
 /*
       observers: ['_makeConfig(_title,_items,_items.splices)'],
 */
+      observers: ['_calcDef(_conf.items,_conf)'],
       _calcDef: function(){
         this.debounce('defbuild',function(){
+          console.log('building conf string!')
           this.formConfig = JSON.stringify(this._conf);
         },200);
       },
