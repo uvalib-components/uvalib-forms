@@ -2,35 +2,6 @@
   "name": "uvalib-forms",
   "main": "uvalib-forms.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0",
     "uvalib-elements": "uvalib-components/uvalib-elements#master"
-  },
-  "resolutions": {
-    "polymer": "^1.9.0",
-    "uvalib-elements": "master",
-    "uvalib-alerts": "master",
-    "uvalib-images": "master",
-    "uvalib-button": "master",
-    "uvalib-analytics": "master",
-    "uvalib-banner": "master",
-    "uvalib-card": "master",
-    "uvalib-events-card": "master",
-    "uvalib-footer": "master",
-    "uvalib-header": "master",
-    "uvalib-helper-libs": "master",
-    "uvalib-hours-card": "master",
-    "uvalib-models": "master",
-    "uvalib-logos": "master",
-    "uvalib-liame": "master",
-    "uvalib-nav": "master",
-    "uvalib-news-section": "master",
-    "uvalib-search-box": "master",
-    "uvalib-skip-nav": "master",
-    "uvalib-social-links": "master",
-    "uvalib-theme": "master",
-    "app-storage": "^0.10.0",
-    "iron-icons": "^1.2.1",
-    "uva-footer": "master",
-    "lodash": "^4.17.4"
   }
 }
